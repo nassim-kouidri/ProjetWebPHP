@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>AngularJS PHP CRUD (Create, Read, Update, Delete) using Bootstrap Modal</title>
+		<script src="jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+		<script src="jquery.dataTables.min.js"></script>
+		<script src="angular-datatables.min.js"></script>
+		<script src="bootstrap.min.js"></script>
+		<link rel="stylesheet" href="bootstrap.min.css">
+		<link rel="stylesheet" href="datatables.bootstrap.css">
+		<link rel="stylesheet" type="text/css" href="gestion.css">
+		
+	</head>
+	<body ng-app="crudApp" ng-controller="crudController">
+		<div class="container" ng-init="fetchData()">
+			<br />
+				<h1>Gestion des offres de stages</h1>
+			<br />
+			<div class="container one">
+				<div class="alert alert-success alert-dismissible" ng-show="success" >
+					<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+					{{successMessage}}
+				</div>
+				<div align="right">
+					<button type="button" id="axyon" name="add_button" ng-click="addData()" class="btn btn-success">Ajouter</button>
+				</div>
+				<br />
+				<div class="table-responsive" style="overflow-x: unset;">
+					<table datatable="ng" dt-options="vm.dtOptions" class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th>Duree du stage</th>
+								<th>Base de remuneration</th>
+								<th>Date de l'offre</th>
+								<th>Nombre de places</th>
+								<th>Competence</th>
+								<th>Id_Entreprise</th>
+								<th>Modifier</th>
+								<th>Supprimer</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="name in namesData">
+								<td>{{name.Duree_Stage}}</td>
+								<td>{{name.Base_Remuneration}}</td>
+								<td>{{name.Date_Offre}}</td>
+								<td>{{name.Nbr_Places}}</td>
+								<td>{{name.Competence}}</td>
+								<td>{{name.Id_Entreprise}}</td>
+								<td><button type="button" id="axyon" ng-click="fetchSingleData(name.Id_Offre)" class="btn btn-warning btn-xs">Modifier</button></td>
+								<td><button type="button" id="axyon" ng-click="deleteData(name.Id_Offre)" class="btn btn-danger btn-xs">Delete</button></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="crudmodal">
+	<div class="modal-dialog" role="document">
+    	<div class="modal-content">
+    		<form method="post" ng-submit="submitForm()">
+	      		<div class="modal-header">
+	        		<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        		<h4 class="modal-title">{{modalTitle}}</h4>
+	      		</div>
+	      		<div class="modal-body">
+	      			<div class="alert alert-danger alert-dismissible" ng-show="error" >
+						<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+						{{errorMessage}}
+					</div>
+					<div class="form-group">
+						<label>Duree du stage</label>
+						<input type="text" name="Duree_Stage" ng-model="Duree_Stage" class="form-control" />
+					</div>
+					<div class="form-group">
+						<label>Base de remuneration</label>
+						<input type="text" name="Base_Remuneration" ng-model="Base_Remuneration" class="form-control" />
+					</div>
+					<div class="form-group">
+						<label>Date de l'offre</label>
+						<input type="text" name="Date_Offre" ng-model="Date_Offre" class="form-control" />
+					</div>
+					<div class="form-group">
+						<label>Nombres de places disponibles</label>
+						<input type="text" name="Nbr_Places" ng-model="Nbr_Places" class="form-control" />
+					</div>
+					<div class="form-group">
+						<label>Competence exiger</label>
+						<input type="text" name="Competence" ng-model="Competence" class="form-control" />
+					</div>
+					<div class="form-group">
+						<label>Nom de l'entreprise</label>
+						<input type="text" name="Id_Entreprise" ng-model="Id_Entreprise" class="form-control" />
+					</div>
+	      		</div>
+	      		<div class="modal-footer">
+	      			<input type="hidden" name="hidden_id" value="{{hidden_id}}" />
+	      			<input type="submit" name="submit" id="submit" class="btn btn-info" value="{{submit_button}}" />
+	        		<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	        	</div>
+	        </form>
+    	</div>
+  	</div>
+</div>
+
+
+<script>
+
+var app = angular.module('crudApp', ['datatables']);
+app.controller('crudController', function($scope, $http){
+
+	$scope.success = false;
+
+	$scope.error = false;
+
+	$scope.fetchData = function(){
+		$http.get('fetch_data.php').success(function(data){
+			$scope.namesData = data;
+		});
+	};
+
+	$scope.openModal = function(){
+		var modal_popup = angular.element('#crudmodal');
+		modal_popup.modal('show');
+	};
+
+	$scope.closeModal = function(){
+		var modal_popup = angular.element('#crudmodal');
+		modal_popup.modal('hide');
+	};
+
+	$scope.addData = function(){
+		$scope.modalTitle = 'Ajouter une offre de stage';
+		$scope.submit_button = 'Insert';
+		$scope.openModal();
+	};
+
+	$scope.submitForm = function(){
+		$http({
+			method:"POST",
+			url:"insert.php",
+			data:{'Duree_Stage':$scope.Duree_Stage, 'Base_Remuneration':$scope.Base_Remuneration, 'Date_Offre':$scope.Date_Offre, 'Nbr_Places':$scope.Nbr_Places, 'Competence':$scope.Competence, 'Id_Entreprise':$scope.Id_Entreprise, 'action':$scope.submit_button, 'Id_Offre':$scope.hidden_id}
+		}).success(function(data){
+			if(data.error != '')
+			{
+				$scope.success = false;
+				$scope.error = true;
+				$scope.errorMessage = data.error;
+			}
+			else
+			{
+				$scope.success = true;
+				$scope.error = false;
+				$scope.successMessage = data.message;
+				$scope.form_data = {};
+				$scope.closeModal();
+				$scope.fetchData();
+			}
+		});
+	};
+
+	$scope.fetchSingleData = function(Id_Offre){
+		$http({
+			method:"POST",
+			url:"insert.php",
+			data:{'Id_Offre':Id_Offre, 'action':'fetch_single_data'}
+		}).success(function(data){
+			$scope.Duree_Stage = data.Duree_Stage;
+			$scope.Base_Remuneration = data.Base_Remuneration;
+			$scope.Date_Offre = data.Date_Offre;
+			$scope.Nbr_Places = data.Nbr_Places;
+			$scope.Competence = data.Competence;
+			$scope.Id_Entreprise = data.Id_Entreprise;
+			$scope.hidden_id = Id_Offre;
+			$scope.modalTitle = 'Modifier une offre de stage';
+			$scope.submit_button = 'Edit';
+			$scope.openModal();
+		});
+	};
+
+	$scope.deleteData = function(Id_Offre){
+		if(confirm("Are you sure you want to remove it?"))
+		{
+			$http({
+				method:"POST",
+				url:"insert.php",
+				data:{'Id_Offre':Id_Offre, 'action':'Delete'}
+			}).success(function(data){
+				$scope.success = true;
+				$scope.error = false;
+				$scope.successMessage = data.message;
+				$scope.fetchData();
+			});	
+		}
+	};
+
+});
+
+</script>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>AngularJS PHP CRUD (Create, Read, Update, Delete) using Bootstrap Modal</title>
+		<script src="jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+		<script src="jquery.dataTables.min.js"></script>
+		<script src="angular-datatables.min.js"></script>
+		<script src="bootstrap.min.js"></script>
+		<link rel="stylesheet" href="bootstrap.min.css">
+		<link rel="stylesheet" href="datatables.bootstrap.css">
+		<link rel="stylesheet" type="text/css" href="gestion.css">
+		
+	</head>
+	<body ng-app="crudApp" ng-controller="crudController">
+		<div class="container" ng-init="fetchData()">
+			<br />
+				<h1>Gestion des entreprises</h1>
+			<br />
+			<div class="container one">
+				<div class="alert alert-success alert-dismissible" ng-show="success" >
+					<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+					{{successMessage}}
+				</div>
+				<div align="right">
+					<button type="button" id="axyon" name="add_button" ng-click="addData()" class="btn btn-success">Ajouter</button>
+				</div>
+				<br />
+				<div class="table-responsive" style="overflow-x: unset;">
+					<table datatable="ng" dt-options="vm.dtOptions" class="table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th>Nom de l'entreprise</th>
+								<th>Secteur d'activite</th>
+								<th>Localite</th>
+								<th>Nombre de stagiere accepter</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="name in namesData" id="oui">
+								<td>{{name.Nom_Entreprise}}</td>
+								<td>{{name.Secteur_Activite}}</td>
+								<td>{{name.Localite}}</td>
+								<td>{{name.Nbr_Stagiere_Accepte}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
+
+
+<script>
+
+var app = angular.module('crudApp', ['datatables']);
+app.controller('crudController', function($scope, $http){
+
+	$scope.success = false;
+
+	$scope.error = false;
+
+	$scope.fetchData = function(){
+		$http.get('fetch_data.php').success(function(data){
+			$scope.namesData = data;
+		});
+	};
+
+	$scope.openModal = function(){
+		var modal_popup = angular.element('#crudmodal');
+		modal_popup.modal('show');
+	};
+
+	$scope.closeModal = function(){
+		var modal_popup = angular.element('#crudmodal');
+		modal_popup.modal('hide');
+	};
+
+	$scope.addData = function(){
+		$scope.modalTitle = 'Ajouter une entreprise';
+		$scope.submit_button = 'Insert';
+		$scope.openModal();
+	};
+});
+
+</script>

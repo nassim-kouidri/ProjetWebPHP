@@ -1,0 +1,17 @@
+body{
+	background-color: #1f6166;
+}
+.one{
+	border-radius: 1em;
+	background-color: white;
+	padding: 2em;
+}
+#axyon{
+	background-color: #1f6166;
+	border: #1f6166;
+}
+h1{
+	text-align: center;
+	color: white;
+	font-weight: bold;
+}
